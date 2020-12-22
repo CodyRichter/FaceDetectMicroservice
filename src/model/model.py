@@ -1,11 +1,18 @@
-import os.path
-from os import path
-import urllib.request
-import cv2
+from matplotlib import pyplot
+from matplotlib.patches import Rectangle
+from mtcnn.mtcnn import MTCNN
 from src.server.dependency import logger
 
-# Cascade filepath
-local_cascade_filepath = 'src/model/frontalface_default_cascade.xml'
+
+"""
+
+Facial detection using Multi-Task Cascaded Convolutional Neural Network
+
+Reference:
+https://machinelearningmastery.com/how-to-perform-face-detection-with-classical-and-deep-learning-methods-in-python-with-keras/ 
+https://arxiv.org/ftp/arxiv/papers/1604/1604.02878.pdf
+
+"""
 
 def init():
     """
@@ -13,15 +20,9 @@ def init():
     model needs have been created, and if not then you should create/fetch them.
     """
 
-    # Where cascade XML file is hosted
+    logger.debug('Nothing to init...')
 
-    frontalface_default_cascade_url = 'https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_default.xml'
-
-    if not path.exists(local_cascade_filepath):
-        urllib.request.urlretrieve(frontalface_default_cascade_url, local_cascade_filepath)
-        logger.debug('Cascade file has been downloaded.')
-    else:
-        logger.debug('Cascade file already downloaded.')
+    
 
 def predict(image_file):
     """
@@ -30,14 +31,36 @@ def predict(image_file):
     with the image as an input.
     """
 
-    
-    face_cascade = cv2.CascadeClassifier(local_cascade_filepath)  # Cascade
-    
-    image = cv2.imread(image_file.name)
-    
-    image_grayscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  # Must make grayscale
-    
-    faces = face_cascade.detectMultiScale(image_grayscale, 1.1, 4)
+    filename = image_file.name
+
+    def draw_image_with_boxes(result_list):
+        # load the image
+        data = pyplot.imread(filename)
+        # plot the image
+        pyplot.imshow(data)
+        # get the context for drawing boxes
+        ax = pyplot.gca()
+        # plot each box
+        for result in result_list:
+            # get coordinates
+            x, y, width, height = result['box']
+            # create the shape
+            rect = Rectangle((x, y), width, height, fill=False, color='red')
+            # draw the box
+            ax.add_patch(rect)
+        # show the plot
+        pyplot.savefig('src/image.jpg')
+
+    pixels = pyplot.imread(filename)
+    # create the detector, using default weights
+    detector = MTCNN()
+    # detect faces in the image
+    faces = detector.detect_faces(pixels)
+
+    # For debug, un comment this method to generate image showing faces detected
+    # draw_image_with_boxes(faces)
+
+    logger.debug(faces)
 
     return {
         'classes': ['number_faces'],  
