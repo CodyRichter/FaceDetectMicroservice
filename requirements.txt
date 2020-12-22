@@ -10,3 +10,6 @@ python-dotenv
 requests
 starlette
 opencv-python
+mtcnn
+matplotlib
+tensorflow
