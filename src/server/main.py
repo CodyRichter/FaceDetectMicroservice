@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 import os
 
 from src.server import dependency
-from src.server.dependency import model_settings, PredictionException, pool, connected
+from src.server.dependency import model_settings, PredictionException, pool, connected, logger
 from src.server.server_connection import register_model_to_server
 
 app = FastAPI()
@@ -27,7 +27,6 @@ origins = [
     "http://localhost:6379",
 ]
 
-logger = logging.getLogger("api")
 
 app.add_middleware(
     CORSMiddleware,

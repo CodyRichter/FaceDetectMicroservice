@@ -1,6 +1,11 @@
-from PIL import Image
-import time
+import os.path
+from os import path
+import urllib.request
+import cv2
+from src.server.dependency import logger
 
+# Cascade filepath
+local_cascade_filepath = 'src/model/frontalface_default_cascade.xml'
 
 def init():
     """
@@ -8,9 +13,15 @@ def init():
     model needs have been created, and if not then you should create/fetch them.
     """
 
-    # Placeholder init code. Replace the sleep with check for model files required etc...
-    time.sleep(1)
+    # Where cascade XML file is hosted
 
+    frontalface_default_cascade_url = 'https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_default.xml'
+
+    if not path.exists(local_cascade_filepath):
+        urllib.request.urlretrieve(frontalface_default_cascade_url, local_cascade_filepath)
+        logger.debug('Cascade file has been downloaded.')
+    else:
+        logger.debug('Cascade file already downloaded.')
 
 def predict(image_file):
     """
@@ -19,12 +30,18 @@ def predict(image_file):
     with the image as an input.
     """
 
-    image = Image.open(image_file.name, mode='r')
+    
+    face_cascade = cv2.CascadeClassifier(local_cascade_filepath)  # Cascade
+    
+    image = cv2.imread(image_file.name)
+    
+    image_grayscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  # Must make grayscale
+    
+    faces = face_cascade.detectMultiScale(image_grayscale, 1.1, 4)
 
     return {
-        'classes': ['isGreen', 'isRed'],  # List every class in the classifier
-        'result': {  # For results, use the class names above with the result value
-            'isGreen': 0,
-            'isRed': 1
+        'classes': ['number_faces'],  
+        'result': { 
+            'number_faces': len(faces),
         }
     }

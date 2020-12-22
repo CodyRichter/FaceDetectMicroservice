@@ -2,6 +2,9 @@ from concurrent.futures.thread import ThreadPoolExecutor
 
 from pydantic import BaseSettings
 
+import logging
+
+logger = logging.getLogger("api")
 
 class Settings(BaseSettings):
     ready_to_predict = False

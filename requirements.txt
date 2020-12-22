@@ -9,3 +9,4 @@ pillow
 python-dotenv
 requests
 starlette
+opencv-python
