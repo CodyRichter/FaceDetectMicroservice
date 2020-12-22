@@ -2,7 +2,7 @@ from matplotlib import pyplot
 from matplotlib.patches import Rectangle
 from mtcnn.mtcnn import MTCNN
 from src.server.dependency import logger
-
+from PIL import Image
 
 """
 
@@ -52,6 +52,7 @@ def predict(image_file):
         pyplot.savefig('src/image.jpg')
 
     pixels = pyplot.imread(filename)
+
     # create the detector, using default weights
     detector = MTCNN()
     # detect faces in the image
@@ -60,7 +61,7 @@ def predict(image_file):
     # For debug, un comment this method to generate image showing faces detected
     # draw_image_with_boxes(faces)
 
-    logger.debug(faces)
+    # logger.debug(faces)
 
     return {
         'classes': ['number_faces'],  
